@@ -1,4 +1,4 @@
-/* 
+/*
 
   The only function that is required in this file is the "move" function
 
@@ -9,8 +9,8 @@
 
   The "move" function must return "North", "South", "East", "West", or "Stay"
   (Anything else will be interpreted by the game as "Stay")
-  
-  The "move" function should accept two arguments that the website will be passing in: 
+
+  The "move" function should accept two arguments that the website will be passing in:
     - a "gameData" object which holds all information about the current state
       of the battle
 
@@ -59,14 +59,14 @@
 
 // // The "Unwise Assassin"
 // // This hero will attempt to kill the closest enemy hero. No matter what.
-// var move = function(gameData, helpers) {
-//   var myHero = gameData.activeHero;
-//   if (myHero.health < 30) {
-//     return helpers.findNearestHealthWell(gameData);
-//   } else {
-//     return helpers.findNearestEnemy(gameData);
-//   }
-// };
+var kill = function(gameData, helpers) {
+  var myHero = gameData.activeHero;
+  if (myHero.health < 30) {
+    return helpers.findNearestHealthWell(gameData);
+  } else {
+    return helpers.findNearestEnemy(gameData);
+  }
+};
 
 // // The "Careful Assassin"
 // // This hero will attempt to kill the closest weaker enemy hero.
@@ -80,7 +80,7 @@
 // };
 
 // // The "Safe Diamond Miner"
-var move = function(gameData, helpers) {
+/*var move = function(gameData, helpers) {
   var myHero = gameData.activeHero;
 
   //Get stats on the nearest health well
@@ -91,7 +91,7 @@ var move = function(gameData, helpers) {
   });
   var distanceToHealthWell = healthWellStats.distance;
   var directionToHealthWell = healthWellStats.direction;
-  
+
 
   if (myHero.health < 40) {
     //Heal no matter what if low health
@@ -104,33 +104,34 @@ var move = function(gameData, helpers) {
     return helpers.findNearestNonTeamDiamondMine(gameData);
   }
 };
+*/
 
 // // The "Selfish Diamond Miner"
 // // This hero will attempt to capture diamond mines (even those owned by teammates).
-// var move = function(gameData, helpers) {
-//   var myHero = gameData.activeHero;
+var mine = function(gameData, helpers) {
+  var myHero = gameData.activeHero;
 
-//   //Get stats on the nearest health well
-//   var healthWellStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-//     if (boardTile.type === 'HealthWell') {
-//       return true;
-//     }
-//   });
+  //Get stats on the nearest health well
+  var healthWellStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+    if (boardTile.type === 'HealthWell') {
+      return true;
+    }
+  });
 
-//   var distanceToHealthWell = healthWellStats.distance;
-//   var directionToHealthWell = healthWellStats.direction;
+  var distanceToHealthWell = healthWellStats.distance;
+  var directionToHealthWell = healthWellStats.direction;
 
-//   if (myHero.health < 40) {
-//     //Heal no matter what if low health
-//     return directionToHealthWell;
-//   } else if (myHero.health < 100 && distanceToHealthWell === 1) {
-//     //Heal if you aren't full health and are close to a health well already
-//     return directionToHealthWell;
-//   } else {
-//     //If healthy, go capture a diamond mine!
-//     return helpers.findNearestUnownedDiamondMine(gameData);
-//   }
-// };
+  if (myHero.health < 40) {
+    //Heal no matter what if low health
+    return directionToHealthWell;
+  } else if (myHero.health < 100 && distanceToHealthWell === 1) {
+    //Heal if you aren't full health and are close to a health well already
+    return directionToHealthWell;
+  } else {
+    //If healthy, go capture a diamond mine!
+    return helpers.findNearestUnownedDiamondMine(gameData);
+  }
+};
 
 // // The "Coward"
 // // This hero will try really hard not to die.
@@ -138,6 +139,23 @@ var move = function(gameData, helpers) {
 //   return helpers.findNearestHealthWell(gameData);
 // }
 
+// The "Schizophrenic"
+// alternate between mine and kill
+var state = kill;
+var cnt = 0;
+var move = function(gameData, helpers) {
+
+	if(cnt++ > 5) {
+		if(state === kill) {
+			state = mine;
+		}else {
+			state = kill;
+		}
+		cnt = 0;
+	}
+
+	return state(gameData, helpers);
+};
 
 // Export the move function here
 module.exports = move;
